@@ -1,0 +1,7 @@
+body {
+    padding: 10px;
+}
+
+.listings-div {
+    border: 3px, color(srgb rgba(0, 0, 0, 0) green blue);
+}

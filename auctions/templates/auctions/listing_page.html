@@ -1,0 +1,101 @@
+{% extends "auctions/layout.html" %}
+
+
+
+{% block body %}
+
+<script>
+    function valid_bid() {
+        const bid_value = parseFloat(document.getElementById('bid_num').value);
+        const price = parseFloat(("{{ listing.price }}"))
+
+        if (bid_value <= price) {
+            alert("Your Bid must be greater than or equal to the price");
+            return false;
+        }
+        else {
+            return true;
+        }
+
+    }
+</script>
+
+    <h1 style="margin-left: 10px;">Listing: {{ listing.category }}</h1>
+
+    {% if user.is_authenticated %}
+        {% if owner %}
+            <form action="{% url 'close_auction' listing_title=listing.title %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning" style="margin-bottom: 10px;">Close Auction</button>
+            </form>
+        {% endif %}
+
+        {% if not in_watchlist %}
+            <form action="{% url 'add_watchlist' listing.title %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success" style="margin-left: 10px; margin-bottom: 10px;">Watchlist</button>
+            </form>
+        {% else %}
+            <form action="{% url 'remove_watchlist' listing.title %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" style="margin-left: 10px; margin-bottom: 10px;">Remove</button>
+            </form>
+            
+        {% endif %}
+    {% endif %}
+
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+
+</br>
+    <div>
+        <img class="img-listing" src="{{ listing.image }}" alt="picture of {{ listing.title }}" style="width: 75%;">
+        <h5 style="margin-left: 10px; margin-top: 10px">{{ listing.title }}</h5>
+        <h4 style="margin-top: 15px;">${{ listing.price }}</h4>
+
+    </div>
+
+
+    {% if user.is_authenticated %}
+        <form action="{% url 'add_bid' listing.title %}" method="POST" onsubmit="return valid_bid()">
+            {% csrf_token %}
+            <div>
+                <h3>Bid</h3>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                    <span class="input-group-text">$</span>
+                    <span class="input-group-text">0.00</span>
+                    </div>
+                    <input type="number" name="bid_value" id="bid_num" class="form-control" aria-label="Amount (to the nearest dollar)">           
+                </div>
+                <button type="submit" class="btn btn-primary">Place Bid</button>
+            </div>
+        </form>
+        <div>
+            <h5>Highest Bid: ${{ highest_bid }}</h5>
+        </div>
+    {% endif %}
+    <h3>Details</h3>
+    <ul>
+        <li>Listed by: {{ listing.owner }}</li>
+    </ul>
+
+    <div>
+        <h3>Comments: </h3>
+        {% for comment in comments %}
+            <p>{{ comment }}</p>
+        {% endfor %}
+        {% if user.is_authenticated %}
+            
+            <form action="{% url 'add_comment' listing_title=listing.title %}" method="POST">
+                {% csrf_token %}
+                <textarea name="new_comment" placeholder="Write Comment Here" style="margin-left: 3px;" cols="30"></textarea>
+                <div>
+                    <button type="submit" class="btn btn-success">Add Comment</button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+
+{% endblock %}
