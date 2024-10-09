@@ -40,8 +40,3 @@ class Comments(models.Model):
 
     def __str__(self):
         return f"{self.owner} \n Comment: {self.message}"
-
-''' 
-    Lecture 4 video helpful times
-        1:27:16
-'''
